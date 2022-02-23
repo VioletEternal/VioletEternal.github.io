@@ -9,7 +9,7 @@
 <meta name="description" content="Eternaltale">
 <meta name="theme-color" content="#ced4da">
 <title>关于 | 落幕の残影</title>
-<link rel="shortcut icon" href="/favicon.ico?v=1645509666511">
+<link rel="shortcut icon" href="/favicon.ico?v=1645592303272">
 <link rel="stylesheet" href="/media/css/gemini.css">
 <link rel="stylesheet" href="/media/fonts/font-awesome.css">
 <link
@@ -167,8 +167,7 @@
       <div class="sidebar-body gemini" id="sidebar_body">
         
           
-            <div class="post-side-meta" id="post_side_meta">
-              
+            
 <div class="sidebar-wrapper box-shadow-wrapper bg-color">
   <div class="sidebar-item">
     <img class="site-author-image right-motion" src="/images/avatar.png"/>
@@ -280,195 +279,6 @@
   </div>
 
 </div>
-            </div>
-            <div class="post-toc sidebar-body-active" id="post_toc" style="opacity: 1;">
-              <div class="toc-box right-motion">
-  <div class="toc-wrapper auto-number auto"
-    id="toc_wrapper">
-    <ul class="markdownIt-TOC">
-<li>
-<ul>
-<li><a href="#%E4%BD%A0%E5%A5%BD">你好！</a></li>
-</ul>
-</li>
-</ul>
-
-  </div>
-</div>
-
-<script>
-
-  let lastTop = 0, lList = [], hList = [], postBody, lastIndex = -1;
-  let active = 'active-show', activeClass = 'active-current';
-  let tocWrapper = document.querySelector('#toc_wrapper');
-  let tocContent = tocWrapper.children[0];
-  let autoNumber = tocWrapper && tocWrapper.classList.contains('auto-number');
-
-  function addTocNumber(elem, deep) {
-    if (!elem) {
-      return;
-    }
-    let prop = elem.__proto__;
-
-    if (prop === HTMLUListElement.prototype) {
-      for (let i = 0; i < elem.children.length; i++) {
-        addTocNumber(elem.children[i], deep + (i + 1) + '.');
-      }
-    } else if (prop === HTMLLIElement.prototype) {
-      // 保存li元素
-      if (elem.children[0] && elem.children[0].__proto__ === HTMLAnchorElement.prototype) {
-        lList.push(elem);
-      }
-      for (let i = 0; i < elem.children.length; i++) {
-        let cur = elem.children[i];
-        if (cur.__proto__ === HTMLAnchorElement.prototype) {
-          if (autoNumber) {
-            cur.text = deep + ' ' + cur.text;
-          }
-        } else if (cur.__proto__ === HTMLUListElement.prototype) {
-          addTocNumber(cur, deep);
-        }
-      }
-    }
-  }
-
-  function removeParentActiveClass() {
-    let parents = tocContent.querySelectorAll('.' + active)
-    parents.forEach(function (elem) {
-      elem.classList.remove(active);
-    });
-  }
-
-  function addActiveClass(index) {
-    if (index >= 0 && index < hList.length) {
-      lList[index].classList.add(activeClass);
-    }
-  }
-
-  function removeActiveClass(index) {
-    if (index >= 0 && index < hList.length) {
-      lList[index].classList.remove(activeClass);
-    }
-  }
-
-  function addActiveLiElemment(elem, parent) {
-    if (!elem || elem === parent) {
-      return;
-    } else {
-      if (elem.__proto__ === HTMLLIElement.prototype) {
-        elem.classList.add(active);
-      }
-      addActiveLiElemment(elem.parentElement, parent);
-    }
-  }
-
-  function showToc() {
-    if (tocWrapper) {
-      postBody = document.querySelector('#post_body');
-      for (let i = 0; i < postBody.children.length; i++) {
-        if (postBody.children[i].__proto__ === HTMLHeadingElement.prototype) {
-          hList.push(postBody.children[i]);
-        }
-      }
-      if (tocWrapper.classList.contains('compress')) {
-        tocContent.classList.add('closed');
-      } else if (tocWrapper.classList.contains('no_compress')) {
-        tocContent.classList.add('expanded');
-      } else {
-        if (hList.length > 10) {
-          active = 'active-hidden'
-          tocContent.classList.add('closed');
-        } else {
-          tocContent.classList.add('expanded');
-        }
-      }
-    }
-  }
-
-  (function () {
-    // 处理不是从#一级标题开始目录
-    if (tocContent.children.length === 1 && tocContent.children[0].__proto__ === HTMLLIElement.prototype) {
-      let con = tocContent.children[0].children[0];
-      tocContent.innerHTML = con.innerHTML;
-    }
-    let markdownItTOC = document.querySelector('.markdownIt-TOC');
-    let innerHeight = window.innerHeight;
-    markdownItTOC.style = `max-height: ${innerHeight - 80 > 0 ? innerHeight - 80 : innerHeight}px`
-    addTocNumber(tocContent, '');
-  })();
-
-  document.addEventListener('scroll', function (e) {
-    if (lList.length <= 0) {
-      return;
-    }
-    let scrollTop = document.scrollingElement.scrollTop + 10;
-    let dir;
-
-    if (lastTop - scrollTop > 0) {
-      dir = 'up';
-    } else {
-      dir = 'down';
-    }
-
-    lastTop = scrollTop;
-    if (scrollTop <= 0) {
-      if (lastIndex >= 0 && lastIndex < hList.length) {
-        lList[lastIndex].classList.remove(activeClass);
-      }
-      return;
-    }
-
-    let current = 0, hasFind = false;
-    for (let i = 0; i < hList.length; i++) {
-      if (hList[i].offsetTop > scrollTop) {
-        current = i;
-        hasFind = true;
-        break;
-      }
-    }
-    if (!hasFind && scrollTop > lList[lList.length - 1].offsetTop) {
-      current = hList.length - 1;
-    } else {
-      current--;
-    }
-    if (dir === 'down') {
-      if (current > lastIndex) {
-        addActiveClass(current);
-        removeActiveClass(lastIndex)
-        lastIndex = current;
-        removeParentActiveClass();
-        lList[current] && addActiveLiElemment(lList[current].parentElement, tocContent);
-      }
-    } else {
-      if (current < lastIndex) {
-        addActiveClass(current);
-        removeActiveClass(lastIndex);
-        lastIndex = current;
-        removeParentActiveClass();
-        lList[current] && addActiveLiElemment(lList[current].parentElement, tocContent);
-      }
-    }
-  });
-
-
-  window.addEventListener('load', function () {
-    showToc();
-    document.querySelector('#sidebar').style = 'display: block;';
-    tocWrapper.classList.add('toc-active');
-    setTimeout(function () {
-      if ("createEvent" in document) {
-        let evt = document.createEvent("HTMLEvents");
-        evt.initEvent("scroll", false, true);
-        document.dispatchEvent(evt);
-      }
-      else {
-        document.fireEvent("scroll");
-      }
-    }, 500)
-  })
-
-</script>
-            </div>
           
         
       </div>
@@ -585,7 +395,7 @@
       <span class="post-meta-divider">|</span>
       <i class="fa fa-file-word-o"></i>
       <span
-        >80<span class="pc-show language" data-lan="words"
+        >81<span class="pc-show language" data-lan="words"
           >字数</span
         ></span
       >
@@ -596,11 +406,10 @@
 
             <div class="post-body next-md-body" id="post_body">
               <figure data-type="image" tabindex="1"><img src="https://www.imageoss.com/images/2021/12/31/Warma-Boom-102dced28ed54996c5.png" alt="Warma" loading="lazy"></figure>
-<h2 id="你好">你好！</h2>
-<p>一名OIer，目前机房最蒻的蒟蒻，连续三年CSP-J崩掉之后终于一等了QWQ，现在whq和OI一样蒻。今年中考也要加油了呢QWQ</p>
-<p>头图事最爱的<a href="https://space.bilibili.com/53456/?spm_id_from=333.999.0.0">Warma</a>酱！！！</p>
-<p>厨<a href="https://www.baidu.com/s?ie=utf-8&amp;f=8&amp;rsv_bp=1&amp;rsv_idx=1&amp;tn=monline_3_dg&amp;wd=UnderTale&amp;fenlei=256&amp;oq=UT&amp;rsv_pq=9dbf7f6900027a78&amp;rsv_t=fe55UbE1mYctmBFeShV%2FIFYeG6fvVYMJ7l4ptAHdCEgj5QXZ0mj6ONkSVgGpEaBE9Wme&amp;rqlang=cn&amp;rsv_enter=1&amp;rsv_dl=tb&amp;rsv_btype=t&amp;inputT=2085&amp;rsv_sug3=5&amp;rsv_sug1=5&amp;rsv_sug7=100&amp;rsv_sug2=0&amp;rsv_sug4=2769">UT</a>，厨<a href="https://www.baidu.com/s?ie=utf-8&amp;f=8&amp;rsv_bp=1&amp;rsv_idx=1&amp;tn=monline_3_dg&amp;wd=MineCraft&amp;fenlei=256&amp;oq=UnderTale&amp;rsv_pq=894890590000e1c2&amp;rsv_t=e703epEk%2Ff1tPGqV863zx%2BAB227kAS1emJMawbNG3qIIg7rb5Lo88Y7c%2BTmorTVzfHDp&amp;rqlang=cn&amp;rsv_enter=1&amp;rsv_dl=tb&amp;rsv_btype=t&amp;inputT=2508&amp;rsv_sug3=7&amp;rsv_sug1=7&amp;rsv_sug7=100&amp;rsv_sug2=0&amp;rsv_sug4=3177">MC</a>，厨<a href="https://www.baidu.com/s?ie=utf-8&amp;f=8&amp;rsv_bp=1&amp;rsv_idx=1&amp;tn=monline_3_dg&amp;wd=Plants%20vs%20Zombies&amp;fenlei=256&amp;oq=Mine%2526lt%253Braft&amp;rsv_pq=878beeb80000d2d5&amp;rsv_t=63f76UHPn%2FV7xfVTAsnzoIiuI6CKrrMm%2F1YWHmD44DabcPvC%2FsEpBLZffQdiCF1jEZRA&amp;rqlang=cn&amp;rsv_enter=1&amp;rsv_dl=tb&amp;rsv_btype=t&amp;inputT=10097&amp;rsv_sug3=13&amp;rsv_sug1=13&amp;rsv_sug7=100&amp;rsv_sug2=0&amp;rsv_sug4=10466">PVZ</a>，厨<a href="https://www.baidu.com/s?ie=utf-8&amp;f=8&amp;rsv_bp=1&amp;rsv_idx=1&amp;tn=monline_3_dg&amp;wd=fl&amp;fenlei=256&amp;oq=Plants%2520vs%2520Zombies&amp;rsv_pq=df92f9630002e40e&amp;rsv_t=ede8a2z5Ml%2FFoE6eDC5BmJSJN1TiTmjnXAkmrzrxbAE97mqF8lNuswBtVX7jvp56c1SK&amp;rqlang=cn&amp;rsv_enter=1&amp;rsv_dl=tb&amp;rsv_btype=t&amp;inputT=682&amp;rsv_sug3=15&amp;rsv_sug1=15&amp;rsv_sug7=100&amp;rsv_sug2=0&amp;rsv_sug4=1019">FL</a>，厨<a href="https://www.baidu.com/s?ie=utf-8&amp;f=8&amp;rsv_bp=1&amp;rsv_idx=1&amp;tn=monline_3_dg&amp;wd=DeltaRune&amp;fenlei=256&amp;oq=deltarune&amp;rsv_pq=f7c6642b0002ac66&amp;rsv_t=11a9e6aVdgyq3PyfOMlqjPiu5ia1MikjOXgNFzIHYkqWwtvdi7IsnMYCceNa24zml4wl&amp;rqlang=cn&amp;rsv_enter=1&amp;rsv_dl=tb&amp;rsv_btype=t&amp;inputT=3768&amp;rsv_sug3=23&amp;rsv_sug1=23&amp;rsv_sug7=100&amp;rsv_sug2=0&amp;rsv_sug4=3768&amp;rsv_sug=1">DR</a>……爱好超级广泛哒QWQ</p>
-<p>附上蒟蒻的LG：<a href="https://www.luogu.com.cn/user/444040">_Eternal_</a></p>
+<p>在 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>O</mi><mi>I</mi></mrow><annotation encoding="application/x-tex">OI</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mord mathdefault" style="margin-right:0.07847em;">I</span></span></span></span> 界，蒟蒻的名字是 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi mathvariant="normal">_</mi><mi>E</mi><mi>t</mi><mi>e</mi><mi>r</mi><mi>n</mi><mi>a</mi><mi>l</mi><mi mathvariant="normal">_</mi></mrow><annotation encoding="application/x-tex">\_Eternal\_</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.00444em;vertical-align:-0.31em;"></span><span class="mord" style="margin-right:0.02778em;">_</span><span class="mord mathdefault" style="margin-right:0.05764em;">E</span><span class="mord mathdefault">t</span><span class="mord mathdefault">e</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mord mathdefault">n</span><span class="mord mathdefault">a</span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord" style="margin-right:0.02778em;">_</span></span></span></span>。这是<a href="https://www.luogu.com.cn/">洛谷</a>以及一些与其相关的网站的用户名。</p>
+<p>在 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>B</mi></mrow><annotation encoding="application/x-tex">B</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.05017em;">B</span></span></span></span> 站，我的账号是<a href="https://space.bilibili.com/356159259?spm_id_from=333.1007.0.0">落幕の残影</a>，英译为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>F</mi><mi>a</mi><mi>l</mi><mi>l</mi><mi>e</mi><mi>n</mi><mi>S</mi><mi>h</mi><mi>a</mi><mi>d</mi><mi>o</mi><mi>w</mi></mrow><annotation encoding="application/x-tex">FallenShadow</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="mord mathdefault">a</span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord mathdefault">e</span><span class="mord mathdefault">n</span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span><span class="mord mathdefault">h</span><span class="mord mathdefault">a</span><span class="mord mathdefault">d</span><span class="mord mathdefault">o</span><span class="mord mathdefault" style="margin-right:0.02691em;">w</span></span></span></span> ，所以和<a href="https://search.bilibili.com/all?keyword=undertale&amp;from_source=webtop_search&amp;spm_id_from=333.1007">Undertale</a>有关的一般都叫这个名字。</p>
+<p>暂时只有这几个地方是涉及了的。</p>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>G</mi><mi>i</mi><mi>t</mi><mi>h</mi><mi>u</mi><mi>b</mi></mrow><annotation encoding="application/x-tex">Github</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault">G</span><span class="mord mathdefault">i</span><span class="mord mathdefault">t</span><span class="mord mathdefault">h</span><span class="mord mathdefault">u</span><span class="mord mathdefault">b</span></span></span></span> 账号：<a href="https://github.com/VioletEternal"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>V</mi><mi>i</mi><mi>o</mi><mi>l</mi><mi>e</mi><mi>t</mi><mi>E</mi><mi>t</mi><mi>e</mi><mi>r</mi><mi>n</mi><mi>a</mi><mi>l</mi></mrow><annotation encoding="application/x-tex">VioletEternal</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.22222em;">V</span><span class="mord mathdefault">i</span><span class="mord mathdefault">o</span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord mathdefault">e</span><span class="mord mathdefault">t</span><span class="mord mathdefault" style="margin-right:0.05764em;">E</span><span class="mord mathdefault">t</span><span class="mord mathdefault">e</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mord mathdefault">n</span><span class="mord mathdefault">a</span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span></span></span></span></a> 。</p>
 
             </div>
             
@@ -1662,11 +1471,10 @@
       <div class="item">
         <a class="result-title" style="opacity: 0;" href="https://violeteternal.github.io/post/about/"" data-c="
           &lt;figure data-type=&#34;image&#34; tabindex=&#34;1&#34;&gt;&lt;img src=&#34;https://www.imageoss.com/images/2021/12/31/Warma-Boom-102dced28ed54996c5.png&#34; alt=&#34;Warma&#34; loading=&#34;lazy&#34;&gt;&lt;/figure&gt;
-&lt;h2 id=&#34;你好&#34;&gt;你好！&lt;/h2&gt;
-&lt;p&gt;一名OIer，目前机房最蒻的蒟蒻，连续三年CSP-J崩掉之后终于一等了QWQ，现在whq和OI一样蒻。今年中考也要加油了呢QWQ&lt;/p&gt;
-&lt;p&gt;头图事最爱的&lt;a href=&#34;https://space.bilibili.com/53456/?spm_id_from=333.999.0.0&#34;&gt;Warma&lt;/a&gt;酱！！！&lt;/p&gt;
-&lt;p&gt;厨&lt;a href=&#34;https://www.baidu.com/s?ie=utf-8&amp;amp;f=8&amp;amp;rsv_bp=1&amp;amp;rsv_idx=1&amp;amp;tn=monline_3_dg&amp;amp;wd=UnderTale&amp;amp;fenlei=256&amp;amp;oq=UT&amp;amp;rsv_pq=9dbf7f6900027a78&amp;amp;rsv_t=fe55UbE1mYctmBFeShV%2FIFYeG6fvVYMJ7l4ptAHdCEgj5QXZ0mj6ONkSVgGpEaBE9Wme&amp;amp;rqlang=cn&amp;amp;rsv_enter=1&amp;amp;rsv_dl=tb&amp;amp;rsv_btype=t&amp;amp;inputT=2085&amp;amp;rsv_sug3=5&amp;amp;rsv_sug1=5&amp;amp;rsv_sug7=100&amp;amp;rsv_sug2=0&amp;amp;rsv_sug4=2769&#34;&gt;UT&lt;/a&gt;，厨&lt;a href=&#34;https://www.baidu.com/s?ie=utf-8&amp;amp;f=8&amp;amp;rsv_bp=1&amp;amp;rsv_idx=1&amp;amp;tn=monline_3_dg&amp;amp;wd=MineCraft&amp;amp;fenlei=256&amp;amp;oq=UnderTale&amp;amp;rsv_pq=894890590000e1c2&amp;amp;rsv_t=e703epEk%2Ff1tPGqV863zx%2BAB227kAS1emJMawbNG3qIIg7rb5Lo88Y7c%2BTmorTVzfHDp&amp;amp;rqlang=cn&amp;amp;rsv_enter=1&amp;amp;rsv_dl=tb&amp;amp;rsv_btype=t&amp;amp;inputT=2508&amp;amp;rsv_sug3=7&amp;amp;rsv_sug1=7&amp;amp;rsv_sug7=100&amp;amp;rsv_sug2=0&amp;amp;rsv_sug4=3177&#34;&gt;MC&lt;/a&gt;，厨&lt;a href=&#34;https://www.baidu.com/s?ie=utf-8&amp;amp;f=8&amp;amp;rsv_bp=1&amp;amp;rsv_idx=1&amp;amp;tn=monline_3_dg&amp;amp;wd=Plants%20vs%20Zombies&amp;amp;fenlei=256&amp;amp;oq=Mine%2526lt%253Braft&amp;amp;rsv_pq=878beeb80000d2d5&amp;amp;rsv_t=63f76UHPn%2FV7xfVTAsnzoIiuI6CKrrMm%2F1YWHmD44DabcPvC%2FsEpBLZffQdiCF1jEZRA&amp;amp;rqlang=cn&amp;amp;rsv_enter=1&amp;amp;rsv_dl=tb&amp;amp;rsv_btype=t&amp;amp;inputT=10097&amp;amp;rsv_sug3=13&amp;amp;rsv_sug1=13&amp;amp;rsv_sug7=100&amp;amp;rsv_sug2=0&amp;amp;rsv_sug4=10466&#34;&gt;PVZ&lt;/a&gt;，厨&lt;a href=&#34;https://www.baidu.com/s?ie=utf-8&amp;amp;f=8&amp;amp;rsv_bp=1&amp;amp;rsv_idx=1&amp;amp;tn=monline_3_dg&amp;amp;wd=fl&amp;amp;fenlei=256&amp;amp;oq=Plants%2520vs%2520Zombies&amp;amp;rsv_pq=df92f9630002e40e&amp;amp;rsv_t=ede8a2z5Ml%2FFoE6eDC5BmJSJN1TiTmjnXAkmrzrxbAE97mqF8lNuswBtVX7jvp56c1SK&amp;amp;rqlang=cn&amp;amp;rsv_enter=1&amp;amp;rsv_dl=tb&amp;amp;rsv_btype=t&amp;amp;inputT=682&amp;amp;rsv_sug3=15&amp;amp;rsv_sug1=15&amp;amp;rsv_sug7=100&amp;amp;rsv_sug2=0&amp;amp;rsv_sug4=1019&#34;&gt;FL&lt;/a&gt;，厨&lt;a href=&#34;https://www.baidu.com/s?ie=utf-8&amp;amp;f=8&amp;amp;rsv_bp=1&amp;amp;rsv_idx=1&amp;amp;tn=monline_3_dg&amp;amp;wd=DeltaRune&amp;amp;fenlei=256&amp;amp;oq=deltarune&amp;amp;rsv_pq=f7c6642b0002ac66&amp;amp;rsv_t=11a9e6aVdgyq3PyfOMlqjPiu5ia1MikjOXgNFzIHYkqWwtvdi7IsnMYCceNa24zml4wl&amp;amp;rqlang=cn&amp;amp;rsv_enter=1&amp;amp;rsv_dl=tb&amp;amp;rsv_btype=t&amp;amp;inputT=3768&amp;amp;rsv_sug3=23&amp;amp;rsv_sug1=23&amp;amp;rsv_sug7=100&amp;amp;rsv_sug2=0&amp;amp;rsv_sug4=3768&amp;amp;rsv_sug=1&#34;&gt;DR&lt;/a&gt;……爱好超级广泛哒QWQ&lt;/p&gt;
-&lt;p&gt;附上蒟蒻的LG：&lt;a href=&#34;https://www.luogu.com.cn/user/444040&#34;&gt;_Eternal_&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;在 &lt;span class=&#34;katex&#34;&gt;&lt;span class=&#34;katex-mathml&#34;&gt;&lt;math&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mi&gt;O&lt;/mi&gt;&lt;mi&gt;I&lt;/mi&gt;&lt;/mrow&gt;&lt;annotation encoding=&#34;application/x-tex&#34;&gt;OI&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;&lt;/span&gt;&lt;span class=&#34;katex-html&#34; aria-hidden=&#34;true&#34;&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.68333em;vertical-align:0em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34; style=&#34;margin-right:0.02778em;&#34;&gt;O&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34; style=&#34;margin-right:0.07847em;&#34;&gt;I&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt; 界，蒟蒻的名字是 &lt;span class=&#34;katex&#34;&gt;&lt;span class=&#34;katex-mathml&#34;&gt;&lt;math&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mi mathvariant=&#34;normal&#34;&gt;_&lt;/mi&gt;&lt;mi&gt;E&lt;/mi&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mi&gt;e&lt;/mi&gt;&lt;mi&gt;r&lt;/mi&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mi&gt;a&lt;/mi&gt;&lt;mi&gt;l&lt;/mi&gt;&lt;mi mathvariant=&#34;normal&#34;&gt;_&lt;/mi&gt;&lt;/mrow&gt;&lt;annotation encoding=&#34;application/x-tex&#34;&gt;\_Eternal\_&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;&lt;/span&gt;&lt;span class=&#34;katex-html&#34; aria-hidden=&#34;true&#34;&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:1.00444em;vertical-align:-0.31em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34; style=&#34;margin-right:0.02778em;&#34;&gt;_&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34; style=&#34;margin-right:0.05764em;&#34;&gt;E&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;t&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;e&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34; style=&#34;margin-right:0.02778em;&#34;&gt;r&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;a&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34; style=&#34;margin-right:0.01968em;&#34;&gt;l&lt;/span&gt;&lt;span class=&#34;mord&#34; style=&#34;margin-right:0.02778em;&#34;&gt;_&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;。这是&lt;a href=&#34;https://www.luogu.com.cn/&#34;&gt;洛谷&lt;/a&gt;以及一些与其相关的网站的用户名。&lt;/p&gt;
+&lt;p&gt;在 &lt;span class=&#34;katex&#34;&gt;&lt;span class=&#34;katex-mathml&#34;&gt;&lt;math&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mi&gt;B&lt;/mi&gt;&lt;/mrow&gt;&lt;annotation encoding=&#34;application/x-tex&#34;&gt;B&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;&lt;/span&gt;&lt;span class=&#34;katex-html&#34; aria-hidden=&#34;true&#34;&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.68333em;vertical-align:0em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34; style=&#34;margin-right:0.05017em;&#34;&gt;B&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt; 站，我的账号是&lt;a href=&#34;https://space.bilibili.com/356159259?spm_id_from=333.1007.0.0&#34;&gt;落幕の残影&lt;/a&gt;，英译为 &lt;span class=&#34;katex&#34;&gt;&lt;span class=&#34;katex-mathml&#34;&gt;&lt;math&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mi&gt;F&lt;/mi&gt;&lt;mi&gt;a&lt;/mi&gt;&lt;mi&gt;l&lt;/mi&gt;&lt;mi&gt;l&lt;/mi&gt;&lt;mi&gt;e&lt;/mi&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mi&gt;S&lt;/mi&gt;&lt;mi&gt;h&lt;/mi&gt;&lt;mi&gt;a&lt;/mi&gt;&lt;mi&gt;d&lt;/mi&gt;&lt;mi&gt;o&lt;/mi&gt;&lt;mi&gt;w&lt;/mi&gt;&lt;/mrow&gt;&lt;annotation encoding=&#34;application/x-tex&#34;&gt;FallenShadow&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;&lt;/span&gt;&lt;span class=&#34;katex-html&#34; aria-hidden=&#34;true&#34;&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.69444em;vertical-align:0em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34; style=&#34;margin-right:0.13889em;&#34;&gt;F&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;a&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34; style=&#34;margin-right:0.01968em;&#34;&gt;l&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34; style=&#34;margin-right:0.01968em;&#34;&gt;l&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;e&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34; style=&#34;margin-right:0.05764em;&#34;&gt;S&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;h&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;a&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;d&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;o&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34; style=&#34;margin-right:0.02691em;&#34;&gt;w&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt; ，所以和&lt;a href=&#34;https://search.bilibili.com/all?keyword=undertale&amp;amp;from_source=webtop_search&amp;amp;spm_id_from=333.1007&#34;&gt;Undertale&lt;/a&gt;有关的一般都叫这个名字。&lt;/p&gt;
+&lt;p&gt;暂时只有这几个地方是涉及了的。&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;katex&#34;&gt;&lt;span class=&#34;katex-mathml&#34;&gt;&lt;math&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mi&gt;G&lt;/mi&gt;&lt;mi&gt;i&lt;/mi&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mi&gt;h&lt;/mi&gt;&lt;mi&gt;u&lt;/mi&gt;&lt;mi&gt;b&lt;/mi&gt;&lt;/mrow&gt;&lt;annotation encoding=&#34;application/x-tex&#34;&gt;Github&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;&lt;/span&gt;&lt;span class=&#34;katex-html&#34; aria-hidden=&#34;true&#34;&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.69444em;vertical-align:0em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;G&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;t&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;h&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;u&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;b&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt; 账号：&lt;a href=&#34;https://github.com/VioletEternal&#34;&gt;&lt;span class=&#34;katex&#34;&gt;&lt;span class=&#34;katex-mathml&#34;&gt;&lt;math&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mi&gt;V&lt;/mi&gt;&lt;mi&gt;i&lt;/mi&gt;&lt;mi&gt;o&lt;/mi&gt;&lt;mi&gt;l&lt;/mi&gt;&lt;mi&gt;e&lt;/mi&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mi&gt;E&lt;/mi&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mi&gt;e&lt;/mi&gt;&lt;mi&gt;r&lt;/mi&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mi&gt;a&lt;/mi&gt;&lt;mi&gt;l&lt;/mi&gt;&lt;/mrow&gt;&lt;annotation encoding=&#34;application/x-tex&#34;&gt;VioletEternal&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;&lt;/span&gt;&lt;span class=&#34;katex-html&#34; aria-hidden=&#34;true&#34;&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.69444em;vertical-align:0em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34; style=&#34;margin-right:0.22222em;&#34;&gt;V&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;o&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34; style=&#34;margin-right:0.01968em;&#34;&gt;l&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;e&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;t&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34; style=&#34;margin-right:0.05764em;&#34;&gt;E&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;t&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;e&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34; style=&#34;margin-right:0.02778em;&#34;&gt;r&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34;&gt;a&lt;/span&gt;&lt;span class=&#34;mord mathdefault&#34; style=&#34;margin-right:0.01968em;&#34;&gt;l&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/a&gt; 。&lt;/p&gt;
 ">关于</a>
       </div>
       
